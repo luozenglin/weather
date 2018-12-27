@@ -4,10 +4,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/choose_area_fragment"
-        android:name="com.luozenglin.myweather.ChooseAreaFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </FrameLayout>
