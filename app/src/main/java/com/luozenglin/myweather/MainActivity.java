@@ -1,4 +1,5 @@
 package com.luozenglin.myweather;
+
 import android.Manifest;
 
 import android.content.Intent;
@@ -11,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
+
 import com.baidu.location.BDLocation;
 import com.baidu.location.BDLocationListener;
 import com.baidu.location.LocationClient;
@@ -22,13 +24,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class MainActivity extends AppCompatActivity {
 
+    private static final int UPDATE_TEXT = 1;
     public LocationClient mLocationClient;
     String myLocationProvince;
     String myLocationCity;
     String myLocationCounty;
+    private boolean flag=true;
+    LocationClientOption option;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             permissionList.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         }
         if (!permissionList.isEmpty()) {
-            String [] permissions = permissionList.toArray(new String[permissionList.size()]);
+            String[] permissions = permissionList.toArray(new String[permissionList.size()]);
             ActivityCompat.requestPermissions(MainActivity.this, permissions, 1);
         } else {
             requestLocation();
@@ -62,10 +66,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initLocation(){
-        LocationClientOption option = new LocationClientOption();
-        option.setScanSpan(5000);
-        option.setIsNeedAddress(true);
-        mLocationClient.setLocOption(option);
+        if(flag) {
+            option = new LocationClientOption();
+            option.setScanSpan(5000);
+            option.setIsNeedAddress(true);
+            mLocationClient.setLocOption(option);
+
+        }
     }
 
     @Override
@@ -91,33 +98,44 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     public class MyLocationListener implements BDLocationListener {
         @Override
         public void onReceiveLocation(BDLocation location) {
             myLocationProvince = location.getProvince();
-            myLocationProvince = myLocationProvince.substring(0,myLocationProvince.length()-1);
             myLocationCity = location.getCity();
-            myLocationCity = myLocationCity.substring(0,myLocationCity.length()-1);
             myLocationCounty = location.getDistrict();
-            myLocationCounty = myLocationCounty.substring(0,myLocationCounty.length()-1);
-            Log.d("MainActivity","my location:"+myLocationProvince+" "+myLocationCity+" "+myLocationCounty);
-            updateProgress();
+            if (myLocationProvince != null && myLocationCity != null && myLocationCounty != null) {
+                flag = false;
+                option.setIsNeedAddress(false);
+                mLocationClient.stop();
+                myLocationProvince = myLocationProvince.substring(0, myLocationProvince.length() - 1);
+                myLocationCity = myLocationCity.substring(0, myLocationCity.length() - 1);
+                myLocationCounty = myLocationCounty.substring(0, myLocationCounty.length() - 1);
+                Log.d("MainActivity", "my location:" + myLocationProvince + " " + myLocationCity + " " + myLocationCounty);
+                String weatherId = Utility.weatherID(MainActivity.this, myLocationProvince, myLocationCity, myLocationCounty);
+                Log.d("MainActivity", "weatherId:" + weatherId);
+                Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+                intent.putExtra("weather_id", weatherId);
+                Log.d("MainActivity", "will to WeatherActivity");
+                startActivity(intent);
+            }
         }
     }
 
     private Handler handler = new Handler(new Handler.Callback() {
         @Override
         public boolean handleMessage(Message msg) {
-            if(myLocationProvince!=null && myLocationCity !=null && myLocationCounty !=null){
-                String weatherId = Utility.weatherID(MainActivity.this,myLocationProvince,myLocationCity,myLocationCounty);
-                Log.d("MainActivity","weatherId:"+weatherId);
-                Intent intent = new Intent(MainActivity.this,WeatherActivity.class);
-                intent.putExtra("weather_id",weatherId);
-                Log.d("MainActivity","will to WeatherActivity");
+            if (myLocationProvince != null && myLocationCity != null && myLocationCounty != null) {
+                handler.removeMessages(1);
+                String weatherId = Utility.weatherID(MainActivity.this, myLocationProvince, myLocationCity, myLocationCounty);
+                Log.d("MainActivity", "weatherId:" + weatherId);
+                Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+                intent.putExtra("weather_id", weatherId);
+                Log.d("MainActivity", "will to WeatherActivity");
                 startActivity(intent);
+            } else {
+                updateProgress();
             }
-            updateProgress();
             return true;
         }
     });
@@ -125,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateProgress() {
         Message msg = Message.obtain();
+        msg.what = UPDATE_TEXT;
         handler.sendMessageDelayed(msg, 500);
     }
 }

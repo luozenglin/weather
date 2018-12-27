@@ -157,7 +157,8 @@ public class Utility {
         List<County> countyList;
         County theCounty = new County();
         do {
-            countyList = DataSupport.where("cityid = ?", String.valueOf(city.getId())).find(County.class);
+            countyList = DataSupport.where("cityId = ?", String.valueOf(city.getId())).find(County.class);
+            Log.d("Utility","select from database countyList:"+countyList);
             if (countyList.size() > 0) {
                 for (County county : countyList) {
                     if (county.getCountyName().equals(countyName)) {
@@ -169,6 +170,7 @@ public class Utility {
                 int provinceCode = province.getProvinceCode();
                 int cityCode = city.getCityCode();
                 String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
+                Log.d("Utility","start to query county from server.city:"+city.getCityName());
                 queryFromServer(activity, address, "county", province, city);
             }
         } while (countyList.isEmpty());

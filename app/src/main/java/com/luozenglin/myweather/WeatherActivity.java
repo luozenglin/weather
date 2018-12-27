@@ -36,8 +36,6 @@ import okhttp3.Response;
 
 public class WeatherActivity extends AppCompatActivity {
 
-    private String KEY = "51a4b4550c664d66a6f11ab18bebabfb";
-
     public DrawerLayout drawerLayout;
 
     public SwipeRefreshLayout swipeRefresh;
@@ -96,15 +94,16 @@ public class WeatherActivity extends AppCompatActivity {
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         navButton = (Button) findViewById(R.id.nav_button);
+        mWeatherId = getIntent().getStringExtra("weather_id");
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString = prefs.getString("weather", null);
+        String weatherString = prefs.getString("weather"+mWeatherId, null);
+        Log.d("WeatherActivity","weather from shared_preferences:"+weatherString);
         if (weatherString != null) {
             Weather weather = Utility.handleWeatherResponse(weatherString);
-            mWeatherId = weather.basic.weatherId;
             showWeatherInfo(weather);
         } else {
-            mWeatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
+            Log.d("WeatherActivity","start to request weather.");
             requestWeather(mWeatherId);
         }
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -127,10 +126,12 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
-
+//CN101010300
+    //http://guolin.tech/api/weather?cityid=CN101010300&51a4b4550c664d66a6f11ab18bebabfb
     public void requestWeather(final String weatherId) {
-        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&"+KEY;
-        Log.d("WeatherActivity","weatherId:"+weatherId);
+        Log.d("WeatherActivity","weatherId for request internet:"+weatherId);
+        String weatherUrl = "http://guolin.tech/api/weather?cityid=" + weatherId + "&key=51a4b4550c664d66a6f11ab18bebabfb";
+        Log.d("WeatherActivity","weatherUrl:"+weatherUrl);
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -142,7 +143,7 @@ public class WeatherActivity extends AppCompatActivity {
                     public void run() {
                         if (weather != null && "ok".equals(weather.status)) {
                             SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                            editor.putString("weather", responseText);
+                            editor.putString("weather"+weatherId, responseText);
                             editor.apply();
                             mWeatherId = weather.basic.weatherId;
                             showWeatherInfo(weather);
