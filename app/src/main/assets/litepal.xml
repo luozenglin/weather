@@ -9,6 +9,7 @@
         <mapping class="com.luozenglin.myweather.common.Province" />
         <mapping class="com.luozenglin.myweather.common.City" />
         <mapping class="com.luozenglin.myweather.common.County" />
+        <mapping class="com.luozenglin.myweather.common.Location" />
     </list>
 
 </litepal>

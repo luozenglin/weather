@@ -27,6 +27,10 @@ public class Utility {
 
 
     public static boolean handleProvinceResponse(String response) {
+        List<Province> list = DataSupport.findAll(Province.class);
+        if(list.size()>0){
+            return true;
+        }
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray allProvinces = new JSONArray(response);
@@ -47,6 +51,10 @@ public class Utility {
 
 
     public static boolean handleCityResponse(String response, int provinceId) {
+        List<City> list = DataSupport.where("provinceid = ?", String.valueOf(provinceId)).find(City.class);
+        if(!list.isEmpty()){
+            return true;
+        }
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray allCities = new JSONArray(response);
@@ -68,6 +76,10 @@ public class Utility {
 
 
     public static boolean handleCountyResponse(String response, int cityId) {
+        List<County> list = DataSupport.where("cityId = ?", String.valueOf(cityId)).find(County.class);
+        if(!list.isEmpty()){
+            return true;
+        }
         if (!TextUtils.isEmpty(response)) {
             try {
                 JSONArray allCounties = new JSONArray(response);

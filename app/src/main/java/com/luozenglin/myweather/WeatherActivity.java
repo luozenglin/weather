@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.luozenglin.myweather.common.City;
+import com.luozenglin.myweather.common.Location;
 import com.luozenglin.myweather.gson.Forecast;
 import com.luozenglin.myweather.gson.Weather;
 import com.luozenglin.myweather.service.AutoUpdateService;
@@ -28,7 +29,10 @@ import com.luozenglin.myweather.utils.HttpUtil;
 import com.luozenglin.myweather.utils.Utility;
 
 
+import org.litepal.crud.DataSupport;
+
 import java.io.IOException;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -115,7 +119,9 @@ public class WeatherActivity extends AppCompatActivity {
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawerLayout.openDrawer(GravityCompat.START);
+                Log.d("WeatherActivity","will to CityManagerActivity");
+                Intent intent = new Intent(WeatherActivity.this,CityManagerActivity.class);
+                startActivity(intent);
             }
         });
         String bingPic = prefs.getString("bing_pic", null);
@@ -208,6 +214,13 @@ public class WeatherActivity extends AppCompatActivity {
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
         forecastLayout.removeAllViews();
+        Location location = new Location();
+        location.setWeatherId(mWeatherId);
+        location.setCounty(cityName);
+        List<Location> lists = DataSupport.where("county = ?", cityName).find(Location.class);
+        if(lists.isEmpty()){
+            location.save();
+        }
         for (Forecast forecast : weather.forecastList) {
             View view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false);
             TextView dateText = (TextView) view.findViewById(R.id.date_text);
