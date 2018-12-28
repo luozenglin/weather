@@ -56,6 +56,8 @@ public class WeatherActivity extends AppCompatActivity {
 
     private LinearLayout forecastLayout;
 
+    private TextView airQualityTest;
+
     private TextView aqiText;
 
     private TextView pm25Text;
@@ -87,6 +89,7 @@ public class WeatherActivity extends AppCompatActivity {
         degreeText = (TextView) findViewById(R.id.degree_text);
         weatherInfoText = (TextView) findViewById(R.id.weather_info_text);
         forecastLayout = (LinearLayout) findViewById(R.id.forecast_layout);
+        airQualityTest = (TextView) findViewById(R.id.air_quality_test);
         aqiText = (TextView) findViewById(R.id.aqi_text);
         pm25Text = (TextView) findViewById(R.id.pm25_text);
         comfortText = (TextView) findViewById(R.id.comfort_text);
@@ -232,6 +235,7 @@ public class WeatherActivity extends AppCompatActivity {
             forecastLayout.addView(view);
         }
         if (weather.aqi != null) {
+            airQualityTest.setText(weather.aqi.city.qlty);
             aqiText.setText(weather.aqi.city.aqi);
             pm25Text.setText(weather.aqi.city.pm25);
         }
