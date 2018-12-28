@@ -20,11 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.luozenglin.myweather.common.City;
 import com.luozenglin.myweather.common.Location;
 import com.luozenglin.myweather.gson.Forecast;
 import com.luozenglin.myweather.gson.Weather;
-import com.luozenglin.myweather.service.AutoUpdateService;
 import com.luozenglin.myweather.utils.HttpUtil;
 import com.luozenglin.myweather.utils.Utility;
 
@@ -244,8 +242,6 @@ public class WeatherActivity extends AppCompatActivity {
         carWashText.setText(carWash);
         sportText.setText(sport);
         weatherLayout.setVisibility(View.VISIBLE);
-        Intent intent = new Intent(this, AutoUpdateService.class);
-        startService(intent);
     }
 
 }
